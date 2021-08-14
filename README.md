@@ -21,4 +21,4 @@ print(age); // My current age!
 
 Please file feature requests and bugs at the [GitHub repository][repo].
 
-[repo]: http://
+[repo]: https://github.com/jeroen-meijer/simple_date
