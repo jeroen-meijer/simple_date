@@ -1,0 +1,29 @@
+name: simple_date
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: google/dart:2.13.4
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: pub get
+
+      - name: Format
+        run: dart format -o write -l 80 --set-exit-if-changed .
+
+      - name: Analyze
+        run: dart analyze lib && dart analyze test && dart analyze example
+
+      - name: Run tests
+        run: dart test --coverage=coverage && pub run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.packages --report-on=lib
+
+      - name: Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
+        with:
+          path: coverage/lcov.info
