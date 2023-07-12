@@ -188,6 +188,26 @@ class SimpleDate {
   /// ```
   SimpleDate latest(SimpleDate other) => isAfter(other) ? this : other;
 
+  /// Clamps this [SimpleDate] between [start] and [end].
+  ///
+  /// If this date is before [start], [start] is returned.
+  /// If this date is after [end], [end] is returned.
+  /// Otherwise, this date is returned.
+  ///
+  /// ```dart
+  /// final start = SimpleDate(2021, 01, 01);
+  /// final end = SimpleDate(2021, 01, 31);
+  ///
+  /// SimpleDate(2020, 12, 31).clamp(start, end); // 2021-01-01
+  /// SimpleDate(2021, 01, 15).clamp(start, end); // 2021-01-15
+  /// SimpleDate(2021, 02, 01).clamp(start, end); // 2021-01-31
+  /// ```
+  SimpleDate clamp(SimpleDate start, SimpleDate end) => isBefore(start)
+      ? start
+      : isAfter(end)
+          ? end
+          : this;
+
   /// Creates a copy of this [SimpleDate] instance and replaces the [year],
   /// [month], and [day] with the given [year], [month], and [day] if provided.
   ///

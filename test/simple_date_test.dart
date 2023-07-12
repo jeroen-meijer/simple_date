@@ -137,6 +137,35 @@ void main() {
       });
     });
 
+    group('clamp', () {
+      test('returns subject when it is between min and max', () {
+        check(
+          SimpleDate(2021, 01, 15).clamp(
+            SimpleDate(2021, 01, 01),
+            SimpleDate(2021, 02, 01),
+          ),
+        ).equals(SimpleDate(2021, 01, 15));
+      });
+
+      test('returns start when subject is before start', () {
+        check(
+          SimpleDate(2021, 01, 01).clamp(
+            SimpleDate(2021, 01, 15),
+            SimpleDate(2021, 02, 01),
+          ),
+        ).equals(SimpleDate(2021, 01, 15));
+      });
+
+      test('returns end when subject is after end', () {
+        check(
+          SimpleDate(2021, 02, 01).clamp(
+            SimpleDate(2021, 01, 01),
+            SimpleDate(2021, 01, 15),
+          ),
+        ).equals(SimpleDate(2021, 01, 15));
+      });
+    });
+
     group('copyWith', () {
       test('only replaces year field when provided', () {
         const before = 2021;
