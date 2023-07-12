@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- feat: add `clamp` method
+
 ## 1.1.0
 
 - feat: add `earliest` and `latest` methods
