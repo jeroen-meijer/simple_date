@@ -89,8 +89,7 @@ class SimpleDate {
   /// since the [day] count can be higher than the resulting date's number of
   /// days, causing it to roll over.
   ///
-  /// If a number of years, months, or days needs to be addewd, use the [add]
-  /// method instead.
+  /// If you want to add years, months, or days, use the [add] method instead.
   ///
   /// ```dart
   /// final before = SimpleDate(2021, 03, 31);
@@ -102,9 +101,19 @@ class SimpleDate {
     int months = 0,
     int days = 0,
   }) {
-    assert(years >= 0);
-    assert(months >= 0);
-    assert(days >= 0);
+    assert(
+      years >= 0,
+      'The number of years to subtract must be greater than or equal to 0. '
+      'If you need to add years, use the add method instead.',
+    );
+    assert(
+        months >= 0,
+        'The number of months to subtract must be greater than or equal to 0. '
+        'If you need to add months, use the add method instead.');
+    assert(
+        days >= 0,
+        'The number of days to subtract must be greater than or equal to 0. '
+        'If you need to add days, use the add method instead.');
 
     return SimpleDate(
       year - years,
@@ -123,8 +132,8 @@ class SimpleDate {
   /// the [day] count can be higher than the resulting date's number of days,
   /// causing it to roll over.
   ///
-  /// If a number of years, months, or days needs to be subtracted, use the
-  /// [subtract] method instead.
+  /// If you want to subtract years, months, or days, use the [subtract] method
+  /// instead.
   ///
   /// ```dart
   /// final before = SimpleDate(2021, 01, 31);
@@ -136,9 +145,21 @@ class SimpleDate {
     int months = 0,
     int days = 0,
   }) {
-    assert(years >= 0);
-    assert(months >= 0);
-    assert(days >= 0);
+    assert(
+      years >= 0,
+      'The number of years to add must be greater than or equal to 0. '
+      'If you need to subtract years, use the subtract method instead.',
+    );
+    assert(
+      months >= 0,
+      'The number of months to add must be greater than or equal to 0. '
+      'If you need to subtract months, use the subtract method instead.',
+    );
+    assert(
+      days >= 0,
+      'The number of days to add must be greater than or equal to 0. '
+      'If you need to subtract days, use the subtract method instead.',
+    );
 
     return SimpleDate(
       year + years,
@@ -147,8 +168,33 @@ class SimpleDate {
     );
   }
 
+  /// Selects the earliest date between this [SimpleDate] and the [other].
+  ///
+  /// ```dart
+  /// final a = SimpleDate(2021, 01, 01);
+  /// final b = SimpleDate(2021, 01, 02);
+  ///
+  /// print(a.earliest(b)); // 2021-01-01
+  /// ```
+  SimpleDate earliest(SimpleDate other) => isBefore(other) ? this : other;
+
+  /// Selects the latest date between this [SimpleDate] and the [other].
+  ///
+  /// ```dart
+  /// final a = SimpleDate(2021, 01, 01);
+  /// final b = SimpleDate(2021, 01, 02);
+  ///
+  /// print(a.latest(b)); // 2021-01-02
+  /// ```
+  SimpleDate latest(SimpleDate other) => isAfter(other) ? this : other;
+
   /// Creates a copy of this [SimpleDate] instance and replaces the [year],
   /// [month], and [day] with the given [year], [month], and [day] if provided.
+  ///
+  /// Tip: Since [SimpleDate] uses [DateTime] under the hood, passing `0` as
+  /// the [day] will result in the last day of the previous month. Similarly,
+  /// passing `0` as the [month] will result in the last month of the previous
+  /// year (but be aware the [day] will be preserved).
   SimpleDate copyWith({
     int? year,
     int? month,
@@ -165,7 +211,7 @@ class SimpleDate {
   SimpleDate get firstDayOfMonth => copyWith(day: 1);
 
   /// A [SimpleDate] for the last day of this month.
-  SimpleDate get lastDayOfMonth => SimpleDate(year, month + 1, 0);
+  SimpleDate get lastDayOfMonth => copyWith(month: month + 1, day: 0);
 
   /// The weekday index for this date.
   ///

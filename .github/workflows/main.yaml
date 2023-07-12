@@ -6,24 +6,48 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: google/dart:2.13.4
+      image: dart:3.0.5
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.5.3
 
       - name: Install Dependencies
-        run: pub get
+        run: dart pub get
 
       - name: Format
-        run: dart format -o write -l 80 --set-exit-if-changed .
+        run: dart format --set-exit-if-changed lib test
 
       - name: Analyze
-        run: dart analyze lib && dart analyze test && dart analyze example
+        run: dart analyze --fatal-infos --fatal-warnings .
 
       - name: Run tests
-        run: dart test --coverage=coverage && pub run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --packages=.packages --report-on=lib
+        run: dart test --chain-stack-traces --coverage=coverage && dart run coverage:format_coverage --lcov --in=coverage --out=coverage/lcov.info --report-on=lib
 
       - name: Check Code Coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v1.1.1
+        uses: VeryGoodOpenSource/very_good_coverage@v2.1.0
         with:
           path: coverage/lcov.info
+          exclude: '**/*.g.dart **/*.gen.dart'
+
+  pana:
+    runs-on: ubuntu-latest
+    container:
+      image: dart:3.0.5
+
+    steps:
+      - uses: actions/checkout@v3.5.3
+
+      - name: Install Dependencies
+        run: |
+          dart pub get
+          dart pub global activate pana 0.21.34
+
+      - name: Verify Pub Score
+        run: |
+          echo "Running pana..."
+          PANA=$(dart pub global run pana . --no-warning); PANA_SCORE=$(echo $PANA | sed -n "s/.*Points: \([0-9]*\)\/\([0-9]*\)./\1\/\2/p")
+          echo "Done. Score: $PANA_SCORE"
+          if [[ $PANA_SCORE != "130/130" ]]; then
+            echo "Pana score is not 130/130. Failing build."
+            exit 1
+          fi
