@@ -4,22 +4,63 @@ import 'package:test/test.dart' hide expect;
 
 void main() {
   group('SimpleDate', () {
+    group('calendar day arithmetic (DST-safe)', () {
+      /// EU (and similar) spring 2026: DST falls between Mar 28 and Apr 3.
+      /// Six *calendar* days before 2026-04-03 must be 2026-03-28 (inclusive
+      /// 7-day window ending on the 3rd). Naive
+      /// `DateTime.subtract(Duration(days: 6))` can land on the *previous*
+      /// calendar day in local time because [Duration] days are 24h steps.
+      test(
+        'subtract(days:) yields calendar dates across a spring DST window',
+        () {
+          final end = SimpleDate(2026, 4, 3);
+          check(end.subtract(days: 6)).equals(SimpleDate(2026, 3, 28));
+        },
+      );
+
+      test('add(days:) is inverse over the same window', () {
+        final start = SimpleDate(2026, 3, 28);
+        check(start.add(days: 6)).equals(SimpleDate(2026, 4, 3));
+      });
+
+      test(
+        'wall-clock Duration(days: 6) can disagree in DST zones; SimpleDate '
+        'does not',
+        () {
+          final endLocalMidnight = DateTime(2026, 4, 3);
+          final naiveAsSimple = SimpleDate.fromDateTime(
+            endLocalMidnight.subtract(const Duration(days: 6)),
+          );
+          final calendar = SimpleDate(2026, 4, 3).subtract(days: 6);
+
+          check(calendar).equals(SimpleDate(2026, 3, 28));
+
+          if (naiveAsSimple != calendar) {
+            check(naiveAsSimple.isBefore(calendar)).isTrue();
+          }
+        },
+      );
+    });
+
     test('supports value equality', () {
       check(SimpleDate(2021, 01, 31)).equals(SimpleDate(2021, 01, 31));
 
-      check(SimpleDate(2021, 01, 31))
-          .not(it()..equals(SimpleDate(2021, 02, 01)));
+      check(
+        SimpleDate(2021, 01, 31),
+      ).not((it) => it.equals(SimpleDate(2021, 02, 01)));
     });
 
     test('has correct hashCode', () {
-      check(SimpleDate(2021, 01, 31).hashCode)
-          .equals(SimpleDate(2021, 01, 31).hashCode);
+      check(
+        SimpleDate(2021, 01, 31).hashCode,
+      ).equals(SimpleDate(2021, 01, 31).hashCode);
     });
 
     group('.fromDateTime', () {
       test('properly converts DateTime to SimpleDate', () {
-        check(SimpleDate.fromDateTime(DateTime(2021, 01, 31)))
-            .equals(SimpleDate(2021, 01, 31));
+        check(
+          SimpleDate.fromDateTime(DateTime(2021, 01, 31)),
+        ).equals(SimpleDate(2021, 01, 31));
       });
     });
 
@@ -55,85 +96,102 @@ void main() {
 
     test('today() is correct', () {
       final now = DateTime.now();
-      check(SimpleDate.today())
-          .equals(SimpleDate(now.year, now.month, now.day));
+      check(
+        SimpleDate.today(),
+      ).equals(SimpleDate(now.year, now.month, now.day));
     });
 
     test('toDateTime converts instance to a DateTime properly', () {
-      check(SimpleDate(2021, 01, 31).toDateTime())
-          .equals(DateTime(2021, 01, 31));
+      check(
+        SimpleDate(2021, 01, 31).toDateTime(),
+      ).equals(DateTime(2021, 01, 31));
     });
 
     test('isBefore returns true when a date is before another', () {
-      check(SimpleDate(2021, 02, 01).isBefore(SimpleDate(2021, 01, 31)))
-          .isFalse();
-      check(SimpleDate(2021, 01, 31).isBefore(SimpleDate(2021, 01, 31)))
-          .isFalse();
+      check(
+        SimpleDate(2021, 02, 01).isBefore(SimpleDate(2021, 01, 31)),
+      ).isFalse();
+      check(
+        SimpleDate(2021, 01, 31).isBefore(SimpleDate(2021, 01, 31)),
+      ).isFalse();
 
-      check(SimpleDate(2021, 01, 31).isBefore(SimpleDate(2021, 02, 01)))
-          .isTrue();
+      check(
+        SimpleDate(2021, 01, 31).isBefore(SimpleDate(2021, 02, 01)),
+      ).isTrue();
     });
 
     test('isAfter returns true when a date is after another', () {
-      check(SimpleDate(2021, 01, 31).isAfter(SimpleDate(2021, 02, 01)))
-          .isFalse();
-      check(SimpleDate(2021, 02, 01).isAfter(SimpleDate(2021, 02, 01)))
-          .isFalse();
+      check(
+        SimpleDate(2021, 01, 31).isAfter(SimpleDate(2021, 02, 01)),
+      ).isFalse();
+      check(
+        SimpleDate(2021, 02, 01).isAfter(SimpleDate(2021, 02, 01)),
+      ).isFalse();
 
-      check(SimpleDate(2021, 02, 01).isAfter(SimpleDate(2021, 01, 31)))
-          .isTrue();
+      check(
+        SimpleDate(2021, 02, 01).isAfter(SimpleDate(2021, 01, 31)),
+      ).isTrue();
     });
 
     test('difference returns difference between two dates', () {
-      check(SimpleDate(2021, 02, 01).difference(SimpleDate(2021, 01, 31)))
-          .equals(const Duration(days: 1));
+      check(
+        SimpleDate(2021, 02, 01).difference(SimpleDate(2021, 01, 31)),
+      ).equals(const Duration(days: 1));
     });
 
     group('subtract', () {
       test('subtracts years from date', () {
-        check(SimpleDate(2021, 01, 31).subtract(years: 1))
-            .equals(SimpleDate(2020, 01, 31));
+        check(
+          SimpleDate(2021, 01, 31).subtract(years: 1),
+        ).equals(SimpleDate(2020, 01, 31));
       });
 
       test('subtracts months from date', () {
-        check(SimpleDate(2021, 02, 01).subtract(months: 1))
-            .equals(SimpleDate(2021, 01, 01));
+        check(
+          SimpleDate(2021, 02, 01).subtract(months: 1),
+        ).equals(SimpleDate(2021, 01, 01));
       });
 
       test('subtracts days from date', () {
-        check(SimpleDate(2021, 01, 31).subtract(days: 1))
-            .equals(SimpleDate(2021, 01, 30));
+        check(
+          SimpleDate(2021, 01, 31).subtract(days: 1),
+        ).equals(SimpleDate(2021, 01, 30));
       });
     });
 
     group('add', () {
       test('adds years to date', () {
-        check(SimpleDate(2021, 01, 31).add(years: 1))
-            .equals(SimpleDate(2022, 01, 31));
+        check(
+          SimpleDate(2021, 01, 31).add(years: 1),
+        ).equals(SimpleDate(2022, 01, 31));
       });
 
       test('adds months to date', () {
-        check(SimpleDate(2021, 01, 01).add(months: 1))
-            .equals(SimpleDate(2021, 02, 01));
+        check(
+          SimpleDate(2021, 01, 01).add(months: 1),
+        ).equals(SimpleDate(2021, 02, 01));
       });
 
       test('adds days to date', () {
-        check(SimpleDate(2021, 01, 30).add(days: 1))
-            .equals(SimpleDate(2021, 01, 31));
+        check(
+          SimpleDate(2021, 01, 30).add(days: 1),
+        ).equals(SimpleDate(2021, 01, 31));
       });
     });
 
     group('earliest', () {
       test('returns earliest date between subject and other', () {
-        check(SimpleDate(2022).earliest(SimpleDate(2021)))
-            .equals(SimpleDate(2021));
+        check(
+          SimpleDate(2022).earliest(SimpleDate(2021)),
+        ).equals(SimpleDate(2021));
       });
     });
 
     group('latest', () {
       test('returns latest date between subject and other', () {
-        check(SimpleDate(2022).latest(SimpleDate(2021)))
-            .equals(SimpleDate(2022));
+        check(
+          SimpleDate(2022).latest(SimpleDate(2021)),
+        ).equals(SimpleDate(2022));
       });
     });
 
@@ -206,13 +264,15 @@ void main() {
     });
 
     test('firstDayOfMonth returns first date of month', () {
-      check(SimpleDate(2021, 01, 31).firstDayOfMonth)
-          .equals(SimpleDate(2021, 01, 01));
+      check(
+        SimpleDate(2021, 01, 31).firstDayOfMonth,
+      ).equals(SimpleDate(2021, 01, 01));
     });
 
     test('lastDayOfMonth returns last date of month', () {
-      check(SimpleDate(2021, 01, 01).lastDayOfMonth)
-          .equals(SimpleDate(2021, 01, 31));
+      check(
+        SimpleDate(2021, 01, 01).lastDayOfMonth,
+      ).equals(SimpleDate(2021, 01, 31));
     });
 
     test('weekday returns weekday index', () {

@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: dart:3.0.5
+      image: dart:3.11.4
 
     steps:
       - uses: actions/checkout@v3.5.3
@@ -32,7 +32,7 @@ jobs:
   pana:
     runs-on: ubuntu-latest
     container:
-      image: dart:3.0.5
+      image: dart:3.11.4
 
     steps:
       - uses: actions/checkout@v3.5.3
@@ -40,7 +40,7 @@ jobs:
       - name: Install Dependencies
         run: |
           dart pub get
-          dart pub global activate pana 0.21.34
+          dart pub global activate pana
 
       - name: Verify Pub Score
         run: |

@@ -6,8 +6,9 @@ void main() {
   group('DateTimeExtensions', () {
     group('toSimpleDate', () {
       test('properly converts DateTime to SimpleDate', () {
-        check(DateTime(2021, 01, 31).toSimpleDate())
-            .equals(SimpleDate(2021, 01, 31));
+        check(
+          DateTime(2021, 01, 31).toSimpleDate(),
+        ).equals(SimpleDate(2021, 01, 31));
       });
     });
   });

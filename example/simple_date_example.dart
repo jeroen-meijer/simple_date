@@ -1,3 +1,4 @@
+// Example is a small CLI-style script; print is intentional.
 // ignore_for_file: avoid_print
 import 'package:simple_date/simple_date.dart';
 

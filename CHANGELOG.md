@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- chore: upgrade dev dependencies (`test`, `checks`, and transitive packages)
+- test: add DST-safe calendar-day arithmetic regression tests
+- test: migrate `checks` assertions for 0.3.x (`it()` removal)
+
 ## 1.1.1
 
 - feat: add `clamp` method

@@ -107,13 +107,15 @@ class SimpleDate {
       'If you need to add years, use the add method instead.',
     );
     assert(
-        months >= 0,
-        'The number of months to subtract must be greater than or equal to 0. '
-        'If you need to add months, use the add method instead.');
+      months >= 0,
+      'The number of months to subtract must be greater than or equal to 0. '
+      'If you need to add months, use the add method instead.',
+    );
     assert(
-        days >= 0,
-        'The number of days to subtract must be greater than or equal to 0. '
-        'If you need to add days, use the add method instead.');
+      days >= 0,
+      'The number of days to subtract must be greater than or equal to 0. '
+      'If you need to add days, use the add method instead.',
+    );
 
     return SimpleDate(
       year - years,
@@ -205,8 +207,8 @@ class SimpleDate {
   SimpleDate clamp(SimpleDate start, SimpleDate end) => isBefore(start)
       ? start
       : isAfter(end)
-          ? end
-          : this;
+      ? end
+      : this;
 
   /// Creates a copy of this [SimpleDate] instance and replaces the [year],
   /// [month], and [day] with the given [year], [month], and [day] if provided.
